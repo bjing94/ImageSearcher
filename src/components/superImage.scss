@@ -1,0 +1,17 @@
+.super-img {
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding-top: 56.25%;
+    position: relative;
+    border-radius: 0.25em;
+    transition: 0.2s;
+    & img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      transform: translate(-50%, -50%);
+    }
+  
+  }

@@ -1,0 +1,14 @@
+@import '../styles/colors.scss';
+.gallery-element{
+    & h5{
+        color: white;
+    }
+    & h6{
+        color:grey;
+    }
+    transition: 0.2s;
+    &:hover{
+        transform: scale(1.1);
+        z-index: 3;
+      }
+}

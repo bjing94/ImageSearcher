@@ -1,0 +1,31 @@
+
+.photo-main-img {
+  width: 100%;
+
+  overflow: hidden;
+  margin: 0;
+  padding-top: 56.25%;
+  position: relative;
+  & img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+
+
+.photo-avatar {
+  border-radius: 50%;
+}
+.photo-info-column {
+  & .title {
+    color: gray;
+  }
+  & .value {
+    color: white;
+  }
+}
+

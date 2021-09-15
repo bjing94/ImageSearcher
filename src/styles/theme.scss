@@ -1,0 +1,19 @@
+@import './colors.scss';
+
+$theme-colors:(
+    "primary":$primary,
+    "secondary":$secondary,
+    "utility":$utility,
+    "background":$background,
+);
+$dropdown-bg: $utility;
+$dropdown-link-color:white;
+$input-color:darken(white,50%);
+$input-focus-color:white;
+$input-bg:$utility;
+$input-border-color:$utility;
+$form-check-input-border:  2px solid white;
+$list-group-color:white;
+$list-group-bg:$utility;
+
+@import "node_modules/bootstrap/scss/bootstrap";

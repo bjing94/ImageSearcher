@@ -1,0 +1,113 @@
+@import "../styles/colors.scss";
+
+.root-container {
+  background-color: $background;
+}
+.dropdown button {
+  text-align: start;
+}
+.full-width {
+  &.dropdown {
+    width: 100%;
+    max-width: 20rem;
+    & .btn {
+      width: 100%;
+    }
+    & .dropdown-menu {
+      width: 100%;
+    }
+  }
+}
+
+.search-bar {
+  & .input-group-append button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  &.dark{
+    & input{
+      background-color: $background;
+    }
+    & .input-group-append button{
+      border-color: $utility;
+      border-left: none;
+    }
+   
+  }
+}
+.search-container{
+  max-width: 1300px !important;
+}
+
+
+.collapse-dropdown-list{
+
+  & li{
+    padding-left: 0;
+    background: none;
+    border:none;
+    & label{
+      display: flex;
+      align-items: center;
+      & input{
+        margin:0;
+      }
+      & text{
+        margin-left: 0.25rem;
+      }
+    }
+  }
+}
+
+.custom-collapse{
+  width: 100%;
+}
+
+.filter-col{
+  width:200px !important;
+  height: 100%;
+  flex-shrink: 0;
+}
+.select-list-item{
+  background: none !important;
+  border:none !important;
+}
+.my-color-picker{
+  width:100% !important;
+}
+
+.color-collection{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  & .color-collection-item{
+
+    width:1.5rem;
+    height: 1.5rem;
+    padding: 0.3rem;
+    border: solid 2px white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    transition: 0.2s;
+    & div{
+      width: 100%;
+      height: 100%;
+    }
+    &:not(:last-child){
+      margin-right: 0.25rem;
+    }
+    &.active{
+      border-color: $primary;
+      border-radius: 0.2em;
+    }
+    &:hover{
+      border-color: goldenrod;
+      border-radius: 0.2em;
+    }
+  }
+  
+  
+}
+

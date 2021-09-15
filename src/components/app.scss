@@ -1,0 +1,39 @@
+@import '../styles/colors.scss';
+@import '../styles/breakpoints.scss';
+.sidebar-col{
+    background-color: white !important;
+    width: 125px;
+    position: fixed;
+    height: 100%;
+    z-index: 5;
+   
+ }
+ .app{
+     background-color: $background;
+     height: 'fit-content';
+     min-height: 100%;
+ }
+ .test{
+     
+     height: 1200px;
+ }
+ .toolbar-col{
+     width:125px ;
+     height: 100%;
+     flex-shrink: 0;
+     @media screen and (max-width:$sm){
+       width: 0px;
+    }
+ }
+ .show-sidebar-col{
+     position: fixed;
+     width: 125px;
+     display: flex;
+     justify-content: center;
+     padding-top: 1rem;
+     z-index: 6;
+ }
+
+.sidebar-col-group{
+    transition: all 0.1s;
+}
