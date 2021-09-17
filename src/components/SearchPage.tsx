@@ -109,40 +109,6 @@ function ColorCollection(props: ColorCollectionProps) {
   return <div className="color-collection">{elements}</div>;
 }
 
-interface SearchPageGalleryProps {
-  query: string | undefined;
-  searchPhotos: (props: SearchProps) => Promise<Response>;
-}
-function SearchPageGallery({ query, searchPhotos }: SearchPageGalleryProps) {
-  const [searchResult, setSearchResult] = useState<any>(null);
-  useEffect(() => {
-    setSearchResult(null);
-    if (query) {
-      let items = query.split("&");
-      items = items.map((item) => {
-        return item.split("=")[1];
-      });
-      console.log(items);
-      const searchParams: (string | undefined)[] = [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-      ];
-      for (let i = 0; i < items.length; i++) {
-        searchParams[i] = items[i];
-      }
-      searchPhotos({
-        query: searchParams[0]!,
-        order_by: searchParams[1]?.toLowerCase(),
-        color: searchParams[2],
-        page: searchParams[3],
-      }).then((res) => setSearchResult(res));
-    }
-  }, []);
-
-  return <Row className="mt-1 g-2"></Row>;
-}
 interface SearchPageProps {
   searchPhotos: (props: SearchProps) => Promise<Response>;
   query: string | undefined;
@@ -161,7 +127,7 @@ export default function SearchPage(props: SearchPageProps) {
   const [sortOpen, setSortOpen] = useState(false);
   const [searchResult, setSearchResult] = useState<any>(null);
   const [searchInput, setSearchInput] = useState<string>(queryProps.query);
-  const [loadingState,setLoadingState]=useState(0);
+  const [loadingState, setLoadingState] = useState(0);
   const history = useHistory();
 
   const validColors = [
@@ -223,6 +189,7 @@ export default function SearchPage(props: SearchPageProps) {
   }
   function getPhotos() {
     setSearchResult(null);
+    setLoadingState(1);
     if (query) {
       const searchParams = getInfoFromQuery(query);
       searchPhotos({
@@ -230,7 +197,9 @@ export default function SearchPage(props: SearchPageProps) {
         order_by: searchParams.order_by,
         color: searchParams.color,
         page: searchParams.page,
-      }).then((res) => setSearchResult(res));
+      })
+        .then((res) => setSearchResult(res))
+       
     }
   }
   //when we change parameter we change query and update page!
@@ -284,29 +253,48 @@ export default function SearchPage(props: SearchPageProps) {
     getPhotos();
   }, [query]);
 
-  const elements = searchResult ? (
-    searchResult.results.map((item: any) => {
-      return (
-        <Col xs={12} lg={6} xl={3} key={`img_${item.id}`}>
-          <Link to={`/photos/${item.id}`} style={{ textDecoration: "none" }}>
-            <SuperImage src={item.urls.regular} alt={`img_${item.id}`} />
-          </Link>
-        </Col>
-      );
-    })
-  ) : (
-    <LoadingPlate size={100} color={"#fff"} />
-  );
-  switch(loadingState){
+  useEffect(()=>{
+    if(searchResult){
+      if(searchResult.results.length===0){
+        setLoadingState(3);
+      }else{
+        setLoadingState(2)
+      }
+    }else{
+      setLoadingState(1);
+    }
+  },[searchResult])
+  useEffect(()=>{
+    
+      setLoadingState(0);
+    
+  },[])
+  let elements;
+  
+  switch (loadingState) {
     case 0:
-      <div>Type something!</div>
+      elements = <h3 style={{ color: `white` }}>Type something! </h3>;
       break;
-      case 1:
-        <div>Loading</div>
-     break;
-     case 1:
-      <div>Loading</div>
-   break;
+    case 1:
+      elements = <LoadingPlate size={100} color={"#fff"} />;
+      break;
+    case 2:
+      elements = searchResult.results.map((item: any) => {
+        return (
+          <Col xs={12} lg={6} xl={3} key={`img_${item.id}`}>
+            <Link to={`/photos/${item.id}`} style={{ textDecoration: "none" }}>
+              <SuperImage src={item.urls.regular} alt={`img_${item.id}`} />
+            </Link>
+          </Col>
+        );
+      });
+      break;
+    case 3:
+      elements = <h3 style={{ color: `white` }}>Zero results</h3>;
+      break;
+    default:
+      elements = <h3 style={{ color: `white` }}>Zero results</h3>;
+      break;
   }
   const totalPages = searchResult ? searchResult.total_pages : 0;
   const filters = (
