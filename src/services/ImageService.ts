@@ -20,7 +20,7 @@ export default class ImageService{
         const per_page = props.per_page ? `&per_page=${props.per_page}`:'&per_page=16';
         const order_by = props.order_by ? `&order_by=${props.order_by}`:'';
         const collections = props.collections ? `&collections=${props.collections}`:'';
-        const color=props.color?`&color=${props.color}`:'';
+        const color=props.color && props.color!=="none"?`&color=${props.color}`:'';
         return fetch(`${this._baseUrl}search/photos?query=${props.query}${page}${per_page}${order_by}${collections}${color}&client_id=${this._apiKey}`).then(res=>res.json())
     }
     getPhoto(id:string){

@@ -13,7 +13,6 @@ import {
 import {TopicProps } from "../interfaces/interfaces";
 import "./galleryPage.scss";
 import LoadingPlate from "./LoadingPlate";
-import NumberOfPages from "./NumberOfPages";
 import SuperImage from './SuperImage';
 
 interface TopicElementProps {
@@ -25,7 +24,7 @@ interface TopicElementProps {
 function TopicElement(props: TopicElementProps) {
   const { description, author, name, frontImage } = props;
   return (
-    <div className="d-flex flex-column gallery-element">
+    <div className="d-flex flex-column gallery-element" key={`topic_${name}`}>
       <div>
        <SuperImage src={frontImage}/>
       </div>
@@ -55,6 +54,7 @@ export default function TopicsPage(props: TopicsPageProps) {
         onClick={() => {
           setOrder(`${option}`);
         }}
+        key={`dropdown_${option}`}
       >
         {option}
       </DropdownItem>
@@ -76,7 +76,7 @@ export default function TopicsPage(props: TopicsPageProps) {
   const elements = data
     ? data.map((topic: any) => {
         return (
-          <Col xs={12} md={6} lg={3}>
+          <Col xs={12} md={6} lg={3} key={`topicEl_${topic.title}`}>
             <Link to={`/topics/${topic.id}`} style={{textDecoration:'none'}}>
             <TopicElement
               name={topic.title}
@@ -109,7 +109,7 @@ export default function TopicsPage(props: TopicsPageProps) {
               }}
             >
               <div className="d-flex align-items-center justify-content-between">
-                <text>{order}</text>
+                {order}
                 {sortOpen ? (
                   <AiOutlineArrowUp className="ms-2" />
                 ) : (

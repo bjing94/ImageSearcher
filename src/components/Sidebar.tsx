@@ -1,31 +1,27 @@
 import React from "react";
-import { Button, Col, ListGroup, ListGroupItem, Row } from "reactstrap";
+import { Button} from "reactstrap";
 import {
-  AiFillFire,
   AiFillHome,
   AiOutlineCopy,
-  AiOutlineDotChart,
-  AiOutlineFile,
-  AiOutlineMore,
-  AiOutlineSearch,
   AiOutlineSlack,
 } from "react-icons/ai";
 import "./sidebar.scss";
 import { Link } from "react-router-dom";
 
-export default function Sidebar() {
+interface SidebarProps{
+  hidden:boolean;
+}
+export default function Sidebar(props:SidebarProps) {
+  const {hidden}=props;
   return (
     <div
-      className={"d-flex flex-column align-items-center h-100 w-100 p-4 "}
+      className={`sidebar-root ${hidden?'hidden':''}`}
       style={{ backgroundColor: "#1a1d2e" }}
     >
-      
-
       <div
-        className="d-flex flex-column align-items-center"
-        style={{ marginTop: "100px" }}
+        className="sidebar-root-group"
       >
-        <Link to="/">
+        <Link to="/search">
         <Button
           outline
           color="secondary"
@@ -39,7 +35,7 @@ export default function Sidebar() {
           <Button
             outline
             color="secondary"
-            className="d-flex justify-content-center align-items-center mt-2"
+            className="d-flex justify-content-center align-items-center"
             size="lg"
           >
             <AiOutlineCopy />
@@ -49,7 +45,7 @@ export default function Sidebar() {
           <Button
             outline
             color="secondary"
-            className="d-flex justify-content-center align-items-center mt-2"
+            className="d-flex justify-content-center align-items-center "
             size="lg"
           >
             <AiOutlineSlack />

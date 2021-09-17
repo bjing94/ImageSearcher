@@ -1,57 +1,34 @@
 import React, { useEffect, useRef } from "react";
 import {
-  Badge,
   Button,
   Col,
   Container,
-  Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
-  FormGroup,
   Input,
   InputGroup,
   InputGroupAddon,
-  InputGroupButtonDropdown,
-  InputGroupText,
-  Label,
   Row,
-  Media,
   Card,
   CardHeader,
   Collapse,
-  CardBody,
-  ListGroup,
-  ListGroupItem,
-  ButtonGroup,
   UncontrolledDropdown,
+  Form,
 } from "reactstrap";
-import Sidebar from "./Sidebar";
-import { ChromePicker } from "react-color";
 import "./searchPage.scss";
 import { useState } from "react";
 import {
   AiOutlineArrowDown,
   AiOutlineArrowUp,
-  AiOutlineEllipsis,
-  AiOutlineLoading,
   AiOutlineMinus,
   AiOutlinePlus,
-  AiOutlineReload,
   AiOutlineSearch,
 } from "react-icons/ai";
 import { SearchProps } from "../interfaces/interfaces";
-import { CircleLoader } from "react-spinners";
 import NumberOfPages from "./NumberOfPages";
 import LoadingPlate from "./LoadingPlate";
-import { Link } from "react-router-dom";
-
-interface superDropdownProps {
-  title: string;
-  items: string[];
-  selectedItem: string;
-  onSelect: (a: string) => void;
-}
+import { Link, useHistory } from "react-router-dom";
 
 interface CustomCollapseProps {
   name: string;
@@ -84,12 +61,13 @@ function CustomCollapse(props: CustomCollapseProps) {
 }
 interface SuperImageProps {
   src: string;
+  alt: string;
 }
 function SuperImage(props: SuperImageProps) {
-  const { src } = props;
+  const { src, alt } = props;
   return (
     <div className="super-img">
-      <img className="rounded" src={src} />
+      <img className="rounded" src={src} alt={alt} />
     </div>
   );
 }
@@ -109,6 +87,7 @@ function ColorCollection(props: ColorCollectionProps) {
           onClick={() => {
             onClickColor(color);
           }}
+          key={`color_${color}`}
         >
           <div style={{ backgroundColor: `black` }}></div>
           <div style={{ backgroundColor: `white` }}></div>
@@ -121,6 +100,7 @@ function ColorCollection(props: ColorCollectionProps) {
         onClick={() => {
           onClickColor(color);
         }}
+        key={`color_${color}`}
       >
         <div style={{ backgroundColor: `${color}` }}></div>
       </div>
@@ -129,17 +109,61 @@ function ColorCollection(props: ColorCollectionProps) {
   return <div className="color-collection">{elements}</div>;
 }
 
-interface SearchPageProps {
+interface SearchPageGalleryProps {
+  query: string | undefined;
   searchPhotos: (props: SearchProps) => Promise<Response>;
 }
-export default function SearchPage(props: SearchPageProps) {
-  const { searchPhotos } = props;
-  const [sortOpen, setSortOpen] = useState(false);
-  const [order, setOrder] = useState("Latest");
+function SearchPageGallery({ query, searchPhotos }: SearchPageGalleryProps) {
   const [searchResult, setSearchResult] = useState<any>(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeColor, setActiveColor] = useState("black");
+  useEffect(() => {
+    setSearchResult(null);
+    if (query) {
+      let items = query.split("&");
+      items = items.map((item) => {
+        return item.split("=")[1];
+      });
+      console.log(items);
+      const searchParams: (string | undefined)[] = [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ];
+      for (let i = 0; i < items.length; i++) {
+        searchParams[i] = items[i];
+      }
+      searchPhotos({
+        query: searchParams[0]!,
+        order_by: searchParams[1]?.toLowerCase(),
+        color: searchParams[2],
+        page: searchParams[3],
+      }).then((res) => setSearchResult(res));
+    }
+  }, []);
+
+  return <Row className="mt-1 g-2"></Row>;
+}
+interface SearchPageProps {
+  searchPhotos: (props: SearchProps) => Promise<Response>;
+  query: string | undefined;
+}
+export default function SearchPage(props: SearchPageProps) {
+  const { searchPhotos, query } = props;
+
+  //First we process given query
+  const queryProps = getInfoFromQuery(query);
+  let activeColor = queryProps.color ? queryProps.color : "none";
+  let order = queryProps.order_by
+    ? queryProps.order_by.charAt(0).toUpperCase() + queryProps.order_by.slice(1)
+    : "Latest";
+  let currentPage = queryProps.page ? +queryProps.page : 1;
+  //then we process states
+  const [sortOpen, setSortOpen] = useState(false);
+  const [searchResult, setSearchResult] = useState<any>(null);
+  const [searchInput, setSearchInput] = useState<string>(queryProps.query);
+  const [loadingState,setLoadingState]=useState(0);
+  const history = useHistory();
+
   const validColors = [
     "black",
     "white",
@@ -153,28 +177,119 @@ export default function SearchPage(props: SearchPageProps) {
     "blue",
     "black_and_white",
   ];
-  function handleApplyFilter() {
-    setSearchResult(null);
-    searchPhotos({
-      query: searchInput,
-      order_by: order.toLowerCase(),
-      color: activeColor,
-      page: currentPage,
-    }).then((res) => setSearchResult(res));
+
+  function getInfoFromQuery(str: string | undefined) {
+    if (str) {
+      let items = str.split("&");
+      items = items.map((item) => {
+        return item.split("=")[1];
+      });
+
+      const searchParams: SearchProps = {
+        query: items[0],
+        order_by: items[1] ? items[1].toLowerCase() : undefined,
+        color: items[2] ? items[2] : undefined,
+        page: items[3] ? items[3] : undefined,
+      };
+      return searchParams;
+    } else {
+      return {
+        query: "",
+        order_by: undefined,
+        color: undefined,
+        page: undefined,
+      };
+    }
   }
-  function handleChangeInput(e: React.ChangeEvent<HTMLInputElement>) {
+  function setSearchQuery(new_query: SearchProps) {
+    let old_query = getInfoFromQuery(query);
+    const newInput = new_query.query;
+    const newPage = new_query.page ? new_query.page : old_query.page;
+
+    const newOrder = new_query.order_by
+      ? new_query.order_by
+      : old_query.order_by;
+    const newColor = new_query.color ? new_query.color : old_query.color;
+
+    const newPageText = newPage ? `&page=${newPage}` : `&page=${1}`;
+    const newOrderText = newOrder
+      ? `&order_by=${newOrder}`
+      : `&order_by=Latest`;
+    const newColorText = newColor ? `&color=${newColor}` : `&color=none`;
+
+    history.push(
+      `/search/query=${newInput}${newOrderText}${newColorText}${newPageText}`
+    );
+  }
+  function getPhotos() {
+    setSearchResult(null);
+    if (query) {
+      const searchParams = getInfoFromQuery(query);
+      searchPhotos({
+        query: searchParams.query,
+        order_by: searchParams.order_by,
+        color: searchParams.color,
+        page: searchParams.page,
+      }).then((res) => setSearchResult(res));
+    }
+  }
+  //when we change parameter we change query and update page!
+  function handleSubmit(e: any) {
+    e.preventDefault();
+    let new_query: SearchProps = {
+      query: searchInput,
+    };
+    setSearchQuery(new_query);
+  }
+  function setActiveColor(new_color: string) {
+    let new_query: SearchProps = {
+      query: searchInput,
+      color: new_color,
+    };
+
+    setSearchQuery(new_query);
+  }
+  function setOrder(new_order: string) {
+    if (new_order != order) {
+      let new_query: SearchProps = {
+        query: searchInput,
+        order_by: new_order,
+      };
+      setSearchQuery(new_query);
+    }
+  }
+  function setCurrentPage(new_page: string) {
+    if (+new_page != currentPage) {
+      let new_query: SearchProps = {
+        query: searchInput,
+        page: new_page,
+      };
+      setSearchQuery(new_query);
+    }
+  }
+
+  function handleChangeInput(e: any) {
     setSearchInput(e.target.value);
   }
+
   useEffect(() => {
-    handleApplyFilter();
-  }, [currentPage]);
+    let cur_query = getInfoFromQuery(query);
+    activeColor = cur_query.color ? cur_query.color : "none";
+    order = cur_query.order_by
+      ? cur_query.order_by.charAt(0).toUpperCase() + cur_query.order_by.slice(1)
+      : "Latest";
+    currentPage = cur_query.page ? +cur_query.page : 1;
+    setSearchInput(cur_query.query);
+
+    getPhotos();
+  }, [query]);
 
   const elements = searchResult ? (
     searchResult.results.map((item: any) => {
       return (
-        <Col xs={12} lg={6} xl={3}>
+        <Col xs={12} lg={6} xl={3} key={`img_${item.id}`}>
           <Link to={`/photos/${item.id}`} style={{ textDecoration: "none" }}>
-            <SuperImage src={item.urls.regular} />
+            <SuperImage src={item.urls.regular} alt={`img_${item.id}`} />
           </Link>
         </Col>
       );
@@ -182,6 +297,17 @@ export default function SearchPage(props: SearchPageProps) {
   ) : (
     <LoadingPlate size={100} color={"#fff"} />
   );
+  switch(loadingState){
+    case 0:
+      <div>Type something!</div>
+      break;
+      case 1:
+        <div>Loading</div>
+     break;
+     case 1:
+      <div>Loading</div>
+   break;
+  }
   const totalPages = searchResult ? searchResult.total_pages : 0;
   const filters = (
     <React.Fragment>
@@ -190,7 +316,7 @@ export default function SearchPage(props: SearchPageProps) {
         <Button
           color="primary"
           style={{ color: "white" }}
-          onClick={handleApplyFilter}
+          // onClick={handleApplyFilter}
         >
           Apply
         </Button>
@@ -202,7 +328,7 @@ export default function SearchPage(props: SearchPageProps) {
               activeColor={activeColor}
               onClickColor={(a: string) => {
                 if (activeColor === a) {
-                  setActiveColor("");
+                  setActiveColor("none");
                 } else {
                   setActiveColor(a);
                 }
@@ -220,18 +346,20 @@ export default function SearchPage(props: SearchPageProps) {
         <Row>
           <Col>
             <div style={{ maxWidth: "600px" }}>
-              <InputGroup className="search-bar">
-                <Input value={searchInput} onChange={handleChangeInput} />
-                <InputGroupAddon addonType="append">
-                  <Button
-                    color="primary"
-                    className="d-flex justify-content-center align-items-center h-100"
-                    onClick={handleApplyFilter}
-                  >
-                    <AiOutlineSearch />
-                  </Button>
-                </InputGroupAddon>
-              </InputGroup>
+              <Form onSubmit={handleSubmit}>
+                <InputGroup className="search-bar">
+                  <Input value={searchInput} onChange={handleChangeInput} />
+                  <InputGroupAddon addonType="append">
+                    <Button
+                      color="primary"
+                      className="d-flex justify-content-center align-items-center h-100"
+                      onClick={handleSubmit}
+                    >
+                      <AiOutlineSearch />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+              </Form>
             </div>
           </Col>
         </Row>
@@ -247,7 +375,7 @@ export default function SearchPage(props: SearchPageProps) {
                   }}
                 >
                   <div className="d-flex align-items-center justify-content-between">
-                    <text>{order}</text>
+                    {order}
                     {sortOpen ? (
                       <AiOutlineArrowUp className="ms-2" />
                     ) : (
@@ -282,7 +410,7 @@ export default function SearchPage(props: SearchPageProps) {
               count={totalPages}
               currentPage={currentPage}
               onClickPage={(page: number) => {
-                setCurrentPage(page);
+                setCurrentPage(page.toString());
               }}
             />
           ) : null}
@@ -290,14 +418,15 @@ export default function SearchPage(props: SearchPageProps) {
       </Container>
     </React.Fragment>
   );
+
   return (
     <Container fluid={true} className={"h-100 p-5 root-container m-0"}>
       <div className="d-flex h-100">
         <Row className="w-100">
-          <Col xs={12} md="auto" className="mb-3">
+          <Col xs={12} md="auto" className="mb-3 ps-0">
             {filters}
           </Col>
-          <Col xs={12} md={true} >
+          <Col xs={12} md={true} className="ps-0">
             {searchElements}
           </Col>
         </Row>

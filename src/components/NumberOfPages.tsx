@@ -45,11 +45,11 @@ export default function NumberOfPages(props: NumberOfPagesProps) {
   }
   const elements = usedNumbers.map((str) => {
     if (+str === currentPage) {
-      return <div className="number-of-pages-item active">{str}</div>;
+      return <div className="number-of-pages-item active" key={`pageNum_${str}`}>{str}</div>;
     }
     if (str === "...") {
       return (
-        <div className="number-of-pages-item">
+        <div className="number-of-pages-item" key={`pageNum_${str}`}>
           <AiOutlineEllipsis />
         </div>
       );
@@ -60,6 +60,7 @@ export default function NumberOfPages(props: NumberOfPagesProps) {
         onClick={() => {
           onClickPage(+str);
         }}
+        key={`pageNum_${str}`}
       >
         {str}
       </div>

@@ -1,13 +1,5 @@
 @import '../styles/colors.scss';
 @import '../styles/breakpoints.scss';
-.sidebar-col{
-    background-color: white !important;
-    width: 125px;
-    position: fixed;
-    height: 100%;
-    z-index: 5;
-   
- }
  .app{
      background-color: $background;
      height: 'fit-content';
@@ -21,8 +13,12 @@
      width:125px ;
      height: 100%;
      flex-shrink: 0;
-     @media screen and (max-width:$sm){
+     transition: all 0.2s;
+     @media screen and (max-width:$md){
        width: 0px;
+    }
+    &.hidden{
+        width: 0px;
     }
  }
  .show-sidebar-col{
@@ -30,8 +26,21 @@
      width: 125px;
      display: flex;
      justify-content: center;
+     align-items: center;
      padding-top: 1rem;
      z-index: 6;
+     & button{
+        margin-top: 0.25rem;
+     }
+     @media screen and (max-width:$md){
+        width: auto;
+        height: auto;
+        justify-content: flex-start;
+        & button{
+            margin-top: 0;
+            margin-left: 0.5rem;
+         }
+     }
  }
 
 .sidebar-col-group{

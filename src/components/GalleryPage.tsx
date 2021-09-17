@@ -25,7 +25,7 @@ export default function GalleryPage(props: GalleryPageProps) {
   const elements = data
     ? data.map((photo: any) => {
         return (
-          <Col xs={12} lg={4} xl={3} >
+          <Col xs={12} lg={4} xl={3} key={`galleryEl_${photo.id}`}>
             <Link to={`/photos/${photo.id}`} style={{textDecoration:'none'}}>
           <SuperImage src={photo.urls.regular} />
           </Link>

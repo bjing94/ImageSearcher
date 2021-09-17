@@ -3,19 +3,12 @@ import {
   Button,
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Row,
-  UncontrolledDropdown,
 } from "reactstrap";
-import SuperImage from "./SuperImage";
 import "./photoPage.scss";
 import {
   AiFillEnvironment,
   AiFillFile,
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
 } from "react-icons/ai";
 import LoadingPlate from "./LoadingPlate";
 interface PhotoPageProps {

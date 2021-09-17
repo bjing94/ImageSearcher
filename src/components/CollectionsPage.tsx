@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import {
   Col,
   Container,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Row,
-  UncontrolledDropdown,
 } from "reactstrap";
 import { CollectionProps } from "../interfaces/interfaces";
 import "./galleryPage.scss";
 import LoadingPlate from "./LoadingPlate";
-import NumberOfPages from "./NumberOfPages";
 import SuperImage from "./SuperImage";
 
 interface GalleryElementProps {
@@ -26,7 +20,7 @@ interface GalleryElementProps {
 function GalleryElement(props: GalleryElementProps) {
   const { description, author, name, frontImage, count } = props;
   return (
-    <div className="d-flex flex-column gallery-element">
+    <div className="d-flex flex-column gallery-element" >
       <div>
         <SuperImage src={frontImage} />
       </div>
@@ -58,7 +52,7 @@ export default function CollectionsPage(props: CollectionsPageProps) {
   const elements = data ? (
     data.map((collection: any) => {
       return (
-        <Col xs={12} md={6} lg={3}>
+        <Col xs={12} md={6} lg={3} key={`collectionEl_${collection.title}`}>
           <Link to={`/collections/${collection.id}`} style={{textDecoration:'none'}}>
           <GalleryElement
             name={collection.title}
@@ -82,7 +76,6 @@ export default function CollectionsPage(props: CollectionsPageProps) {
   ) : (
     <LoadingPlate size={100} color={"#fff"} />
   );
-  console.log(data);
   return (
     <Container fluid={true} className={"h-100 p-5 m-0"}>
       <Row>

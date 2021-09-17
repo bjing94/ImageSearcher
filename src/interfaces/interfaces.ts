@@ -1,7 +1,7 @@
 export interface SearchProps{
     query:string;
-    page?:number;
-    per_page?:number;
+    page?:string;
+    per_page?:string;
     order_by?:string;
     collections?:string;
     color?:string;
